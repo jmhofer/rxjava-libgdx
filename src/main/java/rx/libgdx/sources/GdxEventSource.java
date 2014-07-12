@@ -15,39 +15,16 @@
  */
 package rx.libgdx.sources;
 
-import static rx.Observable.create;
-
-import java.util.concurrent.atomic.AtomicBoolean;
-
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputProcessor;
-import com.badlogic.gdx.physics.box2d.Contact;
-import com.badlogic.gdx.physics.box2d.ContactImpulse;
-import com.badlogic.gdx.physics.box2d.ContactListener;
-import com.badlogic.gdx.physics.box2d.Manifold;
-import com.badlogic.gdx.physics.box2d.World;
-
+import com.badlogic.gdx.physics.box2d.*;
 import rx.Observable;
-import rx.Observable.OnSubscribeFunc;
-import rx.Observer;
-import rx.Subscription;
-import rx.libgdx.events.InputEvent;
-import rx.libgdx.events.KeyDownEvent;
-import rx.libgdx.events.KeyTypedEvent;
-import rx.libgdx.events.KeyUpEvent;
-import rx.libgdx.events.MouseMovedEvent;
-import rx.libgdx.events.ScrolledEvent;
-import rx.libgdx.events.TouchDownEvent;
-import rx.libgdx.events.TouchDraggedEvent;
-import rx.libgdx.events.TouchUpEvent;
-import rx.libgdx.events.box2d.BeginContactEvent;
-import rx.libgdx.events.box2d.ContactEvent;
-import rx.libgdx.events.box2d.EndContactEvent;
-import rx.libgdx.events.box2d.PostSolveContactEvent;
-import rx.libgdx.events.box2d.PreSolveContactEvent;
-import rx.subscriptions.Subscriptions;
-import rx.util.functions.Action0;
-import rx.util.functions.Func1;
+import rx.Subscriber;
+import rx.functions.Func1;
+import rx.libgdx.events.*;
+import rx.libgdx.events.box2d.*;
+
+import static rx.Observable.create;
 
 public enum GdxEventSource { ; // no instances
 
@@ -55,44 +32,36 @@ public enum GdxEventSource { ; // no instances
      * @see rx.GdxObservable#fromBox2DContact
      */
     public static Observable<ContactEvent> fromBox2DContact(final World world) {
-        return create(new OnSubscribeFunc<ContactEvent>() {
-            private final AtomicBoolean subscribed = new AtomicBoolean(true);
+        return create(new Observable.OnSubscribe<ContactEvent>() {
             @Override
-            public Subscription onSubscribe(final Observer<? super ContactEvent> observer) {
+            public void call(final Subscriber<? super ContactEvent> subscriber) {
                 world.setContactListener(new ContactListener() {
                     @Override
                     public void beginContact(Contact contact) {
-                        if (subscribed.get()) {
-                            observer.onNext(new BeginContactEvent(contact));
+                        if (!subscriber.isUnsubscribed()) {
+                            subscriber.onNext(new BeginContactEvent(contact));
                         }
                     }
   
                     @Override
                     public void endContact(Contact contact) {
-                        if (subscribed.get()) {
-                            observer.onNext(new EndContactEvent(contact));
+                        if (!subscriber.isUnsubscribed()) {
+                            subscriber.onNext(new EndContactEvent(contact));
                         }
                     }
   
                     @Override
                     public void preSolve(Contact contact, Manifold oldManifold) {
-                      if (subscribed.get()) {
-                          observer.onNext(new PreSolveContactEvent(contact, oldManifold));
-                      }
+                        if (!subscriber.isUnsubscribed()) {
+                            subscriber.onNext(new PreSolveContactEvent(contact, oldManifold));
+                        }
                     }
   
                     @Override
                     public void postSolve(Contact contact, ContactImpulse impulse) {
-                        if (subscribed.get()) {
-                            observer.onNext(new PostSolveContactEvent(contact, impulse));
+                        if (!subscriber.isUnsubscribed()) {
+                            subscriber.onNext(new PostSolveContactEvent(contact, impulse));
                         }
-                    }
-                });
-                
-                return Subscriptions.create(new Action0() {
-                    @Override
-                    public void call() {
-                        subscribed.set(false);
                     }
                 });
             }
@@ -139,80 +108,97 @@ public enum GdxEventSource { ; // no instances
      * @see rx.GdxObservable#fromInput
      */
     public static Observable<InputEvent> fromInput() {
-        return create(new OnSubscribeFunc<InputEvent>() {
+        return create(new Observable.OnSubscribe<InputEvent>() {
             @Override
-            public Subscription onSubscribe(final Observer<? super InputEvent> observer) {
+            public void call(final Subscriber<? super InputEvent> subscriber) {
                 final InputProcessor wrapped = Gdx.input.getInputProcessor();
                 Gdx.app.getInput().setInputProcessor(new InputProcessor() {
                     @Override
                     public boolean touchUp(int screenX, int screenY, int pointer, int button) {
-                        if (wrapped == null || !wrapped.touchUp(screenX, screenY, pointer, button)) {
-                            observer.onNext(new TouchUpEvent(screenX, screenY, pointer, button));
+                        if (wrapped != null && wrapped.touchUp(screenX, screenY, pointer, button)) {
+                            return true;
+                        } else if (!subscriber.isUnsubscribed()) {
+                            subscriber.onNext(new TouchUpEvent(screenX, screenY, pointer, button));
+                            return true;
                         }
-                        return true;
+                        return false;
                     }
 
                     @Override
                     public boolean touchDown(int screenX, int screenY, int pointer, int button) {
-                        if (wrapped == null || !wrapped.touchDown(screenX, screenY, pointer, button)) {
-                            observer.onNext(new TouchDownEvent(screenX, screenY, pointer, button));
+                        if (wrapped != null && wrapped.touchDown(screenX, screenY, pointer, button)) {
+                            return true;
+                        } else if (!subscriber.isUnsubscribed()) {
+                            subscriber.onNext(new TouchDownEvent(screenX, screenY, pointer, button));
+                            return true;
                         }
-                        return true;
+                        return false;
                     }
 
                     @Override
                     public boolean touchDragged(int screenX, int screenY, int pointer) {
-                        if (wrapped == null || !wrapped.touchDragged(screenX, screenY, pointer)) {
-                            observer.onNext(new TouchDraggedEvent(screenX, screenY, pointer));
+                        if (wrapped != null && wrapped.touchDragged(screenX, screenY, pointer)) {
+                            return true;
+                        } else if (!subscriber.isUnsubscribed()) {
+                            subscriber.onNext(new TouchDraggedEvent(screenX, screenY, pointer));
+                            return true;
                         }
-                        return true;
+                        return false;
                     }
 
                     @Override
                     public boolean keyDown(int keycode) {
-                        if (wrapped == null || !wrapped.keyDown(keycode)) {
-                            observer.onNext(new KeyDownEvent(keycode));
+                        if (wrapped != null && wrapped.keyDown(keycode)) {
+                            return true;
+                        } else if (!subscriber.isUnsubscribed()) {
+                            subscriber.onNext(new KeyDownEvent(keycode));
+                            return true;
                         }
-                        return true;
+                        return false;
                     }
               
                     @Override
                     public boolean keyUp(int keycode) {
-                        if (wrapped == null || !wrapped.keyUp(keycode)) {
-                            observer.onNext(new KeyUpEvent(keycode));
+                        if (wrapped != null && wrapped.keyUp(keycode)) {
+                            return true;
+                        } else if (!subscriber.isUnsubscribed()) {
+                            subscriber.onNext(new KeyUpEvent(keycode));
+                            return true;
                         }
-                        return true;
+                        return false;
                     }
               
                     @Override
                     public boolean keyTyped(char character) {
-                        if (wrapped == null || !wrapped.keyTyped(character)) {
-                            observer.onNext(new KeyTypedEvent(character));
+                        if (wrapped != null && wrapped.keyTyped(character)) {
+                            return true;
+                        } else if (!subscriber.isUnsubscribed()) {
+                            subscriber.onNext(new KeyTypedEvent(character));
+                            return true;
                         }
-                        return true;
+                        return false;
                     }
               
                     @Override
                     public boolean mouseMoved(int screenX, int screenY) {
-                        if (wrapped == null || !wrapped.mouseMoved(screenX, screenY)) {
-                            observer.onNext(new MouseMovedEvent(screenX, screenY));
+                        if (wrapped != null && wrapped.mouseMoved(screenX, screenY)) {
+                            return true;
+                        } else if (!subscriber.isUnsubscribed()) {
+                            subscriber.onNext(new MouseMovedEvent(screenX, screenY));
+                            return true;
                         }
-                        return true;
+                        return false;
                     }
               
                     @Override
                     public boolean scrolled(int amount) {
-                        if (wrapped == null || !wrapped.scrolled(amount)) {
-                            observer.onNext(new ScrolledEvent(amount));
+                        if (wrapped != null && wrapped.scrolled(amount)) {
+                            return true;
+                        } else if (!subscriber.isUnsubscribed()) {
+                            subscriber.onNext(new ScrolledEvent(amount));
+                            return true;
                         }
-                        return true;
-                    }
-                });
-                
-                return Subscriptions.create(new Action0() {
-                    @Override
-                    public void call() {
-                        Gdx.app.getInput().setInputProcessor(wrapped);
+                        return false;
                     }
                 });
             }
