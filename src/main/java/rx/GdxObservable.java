@@ -15,12 +15,16 @@
  */
 package rx;
 
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Net;
 import com.badlogic.gdx.physics.box2d.World;
 
 import rx.Observable;
+import rx.functions.Action0;
 import rx.libgdx.events.InputEvent;
 import rx.libgdx.events.box2d.ContactEvent;
 import rx.libgdx.sources.GdxEventSource;
+import rx.subscriptions.Subscriptions;
 
 /**
  * Allows creating observables from various sources specific to libgdx. 
@@ -46,5 +50,50 @@ public enum GdxObservable { ; // no instances
      */
     public static Observable<ContactEvent> fromBox2DContact(World world) {
         return GdxEventSource.fromBox2DContact(world);
+    }
+
+    /**
+     * Creates an observable corresponding to the http request events.
+     * Publish this and convert to the more specific contact events you require.
+     *
+     * @param httpRequest The request to execute on subscription
+     * @return Observable emitting all lifecycle events.
+     */
+    public static Observable<Net.HttpResponse> fromHttpRequest(final Net.HttpRequest httpRequest) {
+        return Observable.create(new Observable.OnSubscribe<Net.HttpResponse>() {
+
+            @Override
+            public void call(final Subscriber<? super Net.HttpResponse> subscriber) {
+                Gdx.net.sendHttpRequest(httpRequest, new Net.HttpResponseListener() {
+
+                    @Override
+                    public void handleHttpResponse(Net.HttpResponse httpResponse) {
+                        subscriber.onNext(httpResponse);
+                        subscriber.onCompleted();
+                    }
+
+                    @Override
+                    public void failed(Throwable t) {
+                        subscriber.onError(t);
+                    }
+
+                    @Override
+                    public void cancelled() {
+                        subscriber.unsubscribe();
+                    }
+
+                });
+
+                subscriber.add(Subscriptions.create(new Action0() {
+
+                    @Override
+                    public void call() {
+                        Gdx.net.cancelHttpRequest(httpRequest);
+                    }
+
+                }));
+            }
+
+        });
     }
 }
