@@ -13,16 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package rx.libgdx.events;
+package rx.libgdx.events.input;
 
-public class ScrolledEvent implements InputEvent {
-    private final int amount;
+abstract class KeyUpOrDownEvent implements InputEvent {
+    private final int keycode;
   
-    public ScrolledEvent(int amount) {
-        this.amount = amount;
+    public KeyUpOrDownEvent(int keycode) {
+        this.keycode = keycode;
     }
   
-    public int getAmount() {
-        return amount;
+    public int getKeycode() {
+        return keycode;
     }
 }

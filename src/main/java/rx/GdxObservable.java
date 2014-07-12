@@ -21,9 +21,11 @@ import com.badlogic.gdx.physics.box2d.World;
 
 import rx.Observable;
 import rx.functions.Action0;
-import rx.libgdx.events.InputEvent;
+import rx.functions.Func1;
+import rx.libgdx.events.input.InputEvent;
 import rx.libgdx.events.box2d.ContactEvent;
-import rx.libgdx.sources.GdxEventSource;
+import rx.libgdx.sources.GdxBox2DEventSource;
+import rx.libgdx.sources.GdxInputEventSource;
 import rx.subscriptions.Subscriptions;
 
 /**
@@ -34,22 +36,22 @@ public enum GdxObservable { ; // no instances
     /**
      * Creates an observable corresponding to the game's input events.
      * Publish this and convert to the more specific input events you require.
-     * 
+     *
      * @return Observable emitting all input events.
      */
     public static Observable<InputEvent> fromInput() {
-        return GdxEventSource.fromInput();
+        return GdxInputEventSource.fromInput();
     }
 
     /**
      * Creates an observable corresponding to the game's physics contact events (using Box2D).
      * Publish this and convert to the more specific contact events you require.
      *
-     * @param world The Box2D physics world to listen to. 
+     * @param world The Box2D physics world to listen to.
      * @return Observable emitting all contact events.
      */
     public static Observable<ContactEvent> fromBox2DContact(World world) {
-        return GdxEventSource.fromBox2DContact(world);
+        return GdxBox2DEventSource.fromBox2DContact(world);
     }
 
     /**
@@ -96,4 +98,30 @@ public enum GdxObservable { ; // no instances
 
         });
     }
+
+    /**
+     * Filters and casts an observable.
+     *
+     * @param source The source observable
+     * @param clazz The filtered and casted class
+     * @param <U> The source type
+     * @param <T> The filtered and casted type
+     * @return An observable with those events that match the class provided
+     */
+    public static <U, T extends U> Observable<T> filtered(Observable<? extends U> source, final Class<T> clazz) {
+        return source.filter(new Func1<U, Boolean>() {
+
+            @Override
+            public Boolean call(U event) {
+                return clazz.isInstance(event);
+            }
+        }).map(new Func1<U, T>() {
+
+            @Override
+            public T call(U event) {
+                return clazz.cast(event);
+            }
+        });
+    }
+
 }

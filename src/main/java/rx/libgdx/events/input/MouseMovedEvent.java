@@ -13,10 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package rx.libgdx.events;
+package rx.libgdx.events.input;
 
-public class KeyUpEvent extends KeyUpOrDownEvent {
-    public KeyUpEvent(int keycode) {
-        super(keycode);
-    }
+public class MouseMovedEvent extends ScreenCoordsEvent {
+    public MouseMovedEvent(int screenX, int screenY) {
+        super(screenX, screenY);
+    } 
 }

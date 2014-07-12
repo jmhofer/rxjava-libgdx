@@ -13,10 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package rx.libgdx.events;
+package rx.libgdx.events.input;
 
-public class TouchUpEvent extends TouchUpOrDownEvent {
-  public TouchUpEvent(int screenX, int screenY, int pointer, int button) {
-    super(screenX, screenY, pointer, button);
-  }
+public class ScrolledEvent implements InputEvent {
+    private final int amount;
+  
+    public ScrolledEvent(int amount) {
+        this.amount = amount;
+    }
+  
+    public int getAmount() {
+        return amount;
+    }
 }

@@ -13,17 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package rx.libgdx.events;
+package rx.libgdx.events.input;
 
-class TouchUpOrDownEvent extends TouchEvent {
-    private final int button;
-    
-    public TouchUpOrDownEvent(int screenX, int screenY, int pointer, int button) {
-        super(screenX, screenY, pointer);
-        this.button = button;
-    }
-
-    public int getButton() {
-        return button;
-    }
+public class TouchUpEvent extends TouchUpOrDownEvent {
+  public TouchUpEvent(int screenX, int screenY, int pointer, int button) {
+    super(screenX, screenY, pointer, button);
+  }
 }
