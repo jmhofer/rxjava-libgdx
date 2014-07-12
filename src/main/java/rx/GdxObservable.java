@@ -24,8 +24,10 @@ import rx.functions.Action0;
 import rx.functions.Func1;
 import rx.libgdx.events.input.InputEvent;
 import rx.libgdx.events.box2d.ContactEvent;
+import rx.libgdx.events.lifecycle.LifecycleEvent;
 import rx.libgdx.sources.GdxBox2DEventSource;
 import rx.libgdx.sources.GdxInputEventSource;
+import rx.libgdx.sources.GdxLifecycleEventSource;
 import rx.subscriptions.Subscriptions;
 
 /**
@@ -52,6 +54,16 @@ public enum GdxObservable { ; // no instances
      */
     public static Observable<ContactEvent> fromBox2DContact(World world) {
         return GdxBox2DEventSource.fromBox2DContact(world);
+    }
+
+    /**
+     * Creates an observable corresponding to the game's lifecycle events.
+     * Publish this and convert to the more specific contact events you require.
+     *
+     * @return Observable emitting all lifecycle events.
+     */
+    public static Observable<LifecycleEvent> fromLifecycle() {
+        return GdxLifecycleEventSource.fromLifecycle();
     }
 
     /**
