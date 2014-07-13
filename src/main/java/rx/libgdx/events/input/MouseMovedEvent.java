@@ -13,16 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package rx.libgdx.events;
+package rx.libgdx.events.input;
 
-public class ScrolledEvent implements InputEvent {
-    private final int amount;
-  
-    public ScrolledEvent(int amount) {
-        this.amount = amount;
-    }
-  
-    public int getAmount() {
-        return amount;
-    }
+public class MouseMovedEvent extends ScreenCoordsEvent {
+    public MouseMovedEvent(int screenX, int screenY) {
+        super(screenX, screenY);
+    } 
 }

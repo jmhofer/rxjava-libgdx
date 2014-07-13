@@ -13,10 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package rx.libgdx.events;
+package rx.libgdx.events.input;
 
-public class TouchDraggedEvent extends TouchEvent {
-  public TouchDraggedEvent(int screenX, int screenY, int pointer) {
-    super(screenX, screenY, pointer);
-  }
+abstract class KeyUpOrDownEvent implements InputEvent {
+    private final int keycode;
+  
+    public KeyUpOrDownEvent(int keycode) {
+        this.keycode = keycode;
+    }
+  
+    public int getKeycode() {
+        return keycode;
+    }
 }

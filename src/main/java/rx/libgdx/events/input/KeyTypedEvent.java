@@ -13,8 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package rx.libgdx.events;
+package rx.libgdx.events.input;
 
-public interface InputEvent {
-    // marker interface
+public class KeyTypedEvent implements InputEvent {
+    final char character;
+    
+    public KeyTypedEvent(char character) {
+        this.character = character;
+    }
+
+    public char getCharacter() {
+        return character;
+    }
 }

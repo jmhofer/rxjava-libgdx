@@ -13,10 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package rx.libgdx.events;
+package rx.libgdx.events.input;
 
-public class TouchDownEvent extends TouchUpOrDownEvent {
-  public TouchDownEvent(int screenX, int screenY, int pointer, int button) {
-    super(screenX, screenY, pointer, button);
-  }
+abstract class ScreenCoordsEvent implements InputEvent {
+    private final int screenX;
+    private final int screenY;
+    
+    public ScreenCoordsEvent(int screenX, int screenY) {
+        this.screenX = screenX;
+        this.screenY = screenY;
+    }
+
+    public int getScreenX() {
+        return screenX;
+    }
+
+    public int getScreenY() {
+        return screenY;
+    }
 }

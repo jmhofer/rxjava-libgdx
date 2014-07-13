@@ -13,16 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package rx.libgdx.events;
+package rx.libgdx.events.input;
 
-abstract class KeyUpOrDownEvent implements InputEvent {
-    private final int keycode;
-  
-    public KeyUpOrDownEvent(int keycode) {
-        this.keycode = keycode;
-    }
-  
-    public int getKeycode() {
-        return keycode;
+public class KeyUpEvent extends KeyUpOrDownEvent {
+    public KeyUpEvent(int keycode) {
+        super(keycode);
     }
 }

@@ -13,10 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package rx.libgdx.events;
+package rx.libgdx.events.input;
 
-public class KeyDownEvent extends KeyUpOrDownEvent {
-    public KeyDownEvent(int keycode) {
-        super(keycode);
+class TouchUpOrDownEvent extends TouchEvent {
+    private final int button;
+    
+    public TouchUpOrDownEvent(int screenX, int screenY, int pointer, int button) {
+        super(screenX, screenY, pointer);
+        this.button = button;
+    }
+
+    public int getButton() {
+        return button;
     }
 }
