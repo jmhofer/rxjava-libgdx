@@ -1,5 +1,5 @@
 /**
- * Copyright 2013 Netflix, Inc.
+ * Copyright 2014 Joachim Hofer & contributors
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,6 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Net;
 import com.badlogic.gdx.physics.box2d.World;
 
-import rx.Observable;
 import rx.functions.Action0;
 import rx.functions.Func1;
 import rx.libgdx.events.input.InputEvent;
