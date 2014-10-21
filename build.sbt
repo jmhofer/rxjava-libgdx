@@ -1,11 +1,11 @@
-version := "0.1"
+version := "0.2"
 
 name := "rxjava-libgdx"
 
 organization := "de.johoop"
 
 libraryDependencies ++= Seq(
-  "io.reactivex" % "rxjava" % "1.0.0-rc.6",
+  "io.reactivex" % "rxjava" % "1.0.0-rc.6", // the version currently supported by RxScala
   "com.badlogicgames.gdx" % "gdx" % "1.4.1",
   "com.badlogicgames.gdx" % "gdx-box2d" % "1.4.1",
   "com.novocode" % "junit-interface" % "0.9" % "test",

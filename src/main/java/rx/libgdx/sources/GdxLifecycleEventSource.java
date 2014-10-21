@@ -1,6 +1,5 @@
-/**
+/*
  * Copyright 2014 Joachim Hofer & contributors
-
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,20 +20,16 @@ import com.badlogic.gdx.LifecycleListener;
 import rx.Observable;
 import rx.Subscriber;
 import rx.functions.Action0;
-import rx.libgdx.events.lifecycle.DisposeEvent;
-import rx.libgdx.events.lifecycle.LifecycleEvent;
-import rx.libgdx.events.lifecycle.PauseEvent;
-import rx.libgdx.events.lifecycle.ResumeEvent;
+import rx.libgdx.events.lifecycle.*;
 import rx.subscriptions.Subscriptions;
 
 import static rx.GdxObservable.filtered;
-import static rx.Observable.create;
 
 public enum GdxLifecycleEventSource {
     ;
 
     public static Observable<LifecycleEvent> fromLifecycle() {
-        return create(new Observable.OnSubscribe<LifecycleEvent>() {
+        return Observable.create(new Observable.OnSubscribe<LifecycleEvent>() {
 
             @Override
             public void call(final Subscriber<? super LifecycleEvent> subscriber) {
@@ -108,4 +103,33 @@ public enum GdxLifecycleEventSource {
         return filtered(source, DisposeEvent.class);
     }
 
+    /**
+     * Returns all "Create" events.
+     *
+     * @param source The observable of lifecycle events to use as source.
+     * @return An observable emitting "Touch Up" events.
+     */
+    public static Observable<CreateEvent> create(Observable<? extends LifecycleEvent> source) {
+        return filtered(source, CreateEvent.class);
+    }
+
+    /**
+     * Returns all "Render" events.
+     *
+     * @param source The observable of lifecycle events to use as source.
+     * @return An observable emitting "Touch Up" events.
+     */
+    public static Observable<RenderEvent> render(Observable<? extends LifecycleEvent> source) {
+        return filtered(source, RenderEvent.class);
+    }
+
+    /**
+     * Returns all "Resize" events.
+     *
+     * @param source The observable of lifecycle events to use as source.
+     * @return An observable emitting "Touch Up" events.
+     */
+    public static Observable<ResizeEvent> resize(Observable<? extends LifecycleEvent> source) {
+        return filtered(source, ResizeEvent.class);
+    }
 }
