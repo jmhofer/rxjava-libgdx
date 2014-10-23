@@ -2,7 +2,7 @@
 
 ## Usage
 
-It's on Bintray, as `"de.johoop." % "rxjava-libgdx" % "0.1"`.
+It's on Bintray, as `"de.johoop." % "rxjava-libgdx" % "0.2"`.
 
 # Build
 
